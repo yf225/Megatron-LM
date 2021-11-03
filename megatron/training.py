@@ -151,10 +151,24 @@ def pretrain(train_valid_test_dataset_provider,
 
     iteration = 0
     if args.do_train and args.train_iters > 0:
+        prof = torch.profiler.profile(
+            activities=[
+                torch.profiler.ProfilerActivity.CPU,
+                torch.profiler.ProfilerActivity.CUDA,
+            ]
+        )
+        prof.start()
+
         iteration = train(forward_step_func,
                           model, optimizer, opt_param_scheduler,
                           train_data_iterator, valid_data_iterator,
                           process_non_loss_data_func)
+
+        prof.stop()
+        trace_dir_path = "megatron_trace"
+        if not os.path.isdir(trace_dir_path):
+            os.mkdir(trace_dir_path)
+        prof.export_chrome_trace(os.path.join(trace_dir_path, "trace_{}.json".format(str(torch.distributed.get_rank()))))
     print_datetime('after training is done')
 
     if args.do_valid:
