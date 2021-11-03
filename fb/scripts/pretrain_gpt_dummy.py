@@ -52,7 +52,6 @@ from megatron import fused_kernels as megatron__fused_kernels
 megatron__fused_kernels.load = dummy_fused_kernels_load
 '''
 
-
 from megatron import arguments as megatron__arguments
 
 _add_data_args_original = megatron__arguments._add_data_args
