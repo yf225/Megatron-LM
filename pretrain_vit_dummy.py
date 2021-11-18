@@ -25,6 +25,8 @@ from megatron.model.vit_model import VitModel
 from megatron.training import pretrain
 from megatron.utils import average_losses_across_data_parallel_group
 
+cpu_datatype = torch.float
+
 def model_provider(pre_process=True, post_process=True):
     """Build the model."""
 
@@ -42,19 +44,15 @@ def get_batch(data_iterator):
 
     # Broadcast data.
     keys = ["image", "label"]
-    datatype = torch.float
     if data_iterator is not None:
         data = next(data_iterator)
     else:
         data = None
-    data_b = mpu.broadcast_data(keys, data, datatype)
+    data_b = mpu.broadcast_data(keys, data, cpu_datatype)
 
     images = data_b["image"]
     labels = data_b["label"]
-    print("images.shape: ", images.shape)
-
-    # assert tokens.shape[0] == args.micro_batch_size
-    # assert tokens.shape[1] == args.seq_length
+    assert images.shape[0] == args.micro_batch_size
 
     return images, labels
 
@@ -97,8 +95,8 @@ class VitDummyDataset(torch.utils.data.Dataset):
 
     def __getitem__(self, index):
         return {
-            "image": torch.randn(3, self.crop_size, self.crop_size),
-            "label": 1.0,
+            "image": torch.randn(3, self.crop_size, self.crop_size).to(cpu_datatype),
+            "label": torch.tensor(1.0).to(cpu_datatype),
         }
 
 def build_train_valid_datasets_dummy(crop_size=224):
