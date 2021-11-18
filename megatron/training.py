@@ -159,6 +159,19 @@ def pretrain(train_valid_test_dataset_provider,
 
     iteration = 0
     if args.do_train and args.train_iters > 0:
+        from torch.nn.modules.module import register_module_forward_pre_hook
+        from torch.nn.modules.module import register_module_forward_hook
+
+        def recorder_enter_hook(module, input):
+            module._torch_profiler_recorder = torch.autograd.profiler.record_function(str(module.__class__))
+            module._torch_profiler_recorder.__enter__()
+
+        def recorder_exit_hook(module, input, output):
+            module._torch_profiler_recorder.__exit__(None, None, None)
+
+        register_module_forward_pre_hook(recorder_enter_hook)
+        register_module_forward_hook(recorder_exit_hook)
+
         prof = torch.profiler.profile(
             activities=[
                 torch.profiler.ProfilerActivity.CPU,
