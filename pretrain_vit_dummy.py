@@ -80,6 +80,9 @@ class VitDummyDataset(torch.utils.data.Dataset):
     def __init__(self, crop_size=224):
         self.crop_size = crop_size
 
+    def __len__(self):
+        return 100000
+
     def __getitem__(self, index):
         return torch.randn(1, crop_size, crop_size, 3)
 
