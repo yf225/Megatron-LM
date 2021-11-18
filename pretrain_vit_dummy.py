@@ -43,12 +43,12 @@ def get_batch(data_iterator):
 
     # Broadcast data.
     keys = ["image", "label"]
-    datatypes = [torch.half, torch.long]
+    datatype = torch.long
     if data_iterator is not None:
         data = next(data_iterator)
     else:
         data = None
-    data_b = mpu.broadcast_data(keys, data, datatypes)
+    data_b = mpu.broadcast_data(keys, data, datatype)
 
     images = data_b["image"]
     labels = data_b["label"]
@@ -95,7 +95,7 @@ class VitDummyDataset(torch.utils.data.Dataset):
 
     def __getitem__(self, index):
         return {
-            "image": torch.randn(3, self.crop_size, self.crop_size).to(torch.half),
+            "image": torch.randint(0, 1, (3, self.crop_size, self.crop_size)).to(torch.long),
             "label": torch.tensor(1).to(torch.long),
         }
 
