@@ -124,7 +124,7 @@ def build_train_valid_datasets_dummy(data_path, crop_size=224, color_jitter=True
     # val_data = datasets.ImageFolder(
     #     root=val_data_path, transform=transform_val
     # )
-    val_data = []
+    val_data = VitDummyDataset()
 
     return train_data, val_data
 
