@@ -176,7 +176,7 @@ def pretrain(train_valid_test_dataset_provider,
         trace_dir_path = "megatron_trace"
         if not os.path.isdir(trace_dir_path):
             os.mkdir(trace_dir_path)
-        prof.export_chrome_trace(os.path.join(trace_dir_path, "trace_{}.json".format(str(torch.distributed.get_rank()))))
+        prof.export_chrome_trace(os.path.join(trace_dir_path, "trace_{}_{}.json".format(str(int(time.time())), str(torch.distributed.get_rank()))))
     print_datetime('after training is done')
 
     if args.do_valid:
