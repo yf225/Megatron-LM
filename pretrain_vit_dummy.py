@@ -95,8 +95,8 @@ class VitDummyDataset(torch.utils.data.Dataset):
 
     def __getitem__(self, index):
         return {
-            "image": torch.randn(3, self.crop_size, self.crop_size, dtype=torch.half),
-            "label": torch.tensor(1, dtype=torch.long),
+            "image": torch.randn(3, self.crop_size, self.crop_size).to(torch.half),
+            "label": torch.tensor(1).to(torch.long),
         }
 
 def build_train_valid_datasets_dummy(crop_size=224):
