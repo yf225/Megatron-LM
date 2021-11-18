@@ -530,7 +530,8 @@ def train_step(forward_step_func, data_iterator,
 
     # Update parameters.
     timers('optimizer').start()
-    update_successful, grad_norm, num_zeros_in_grad = optimizer.step()
+    with torch.autograd.profiler.record_function("### optimizer step ###"):
+        update_successful, grad_norm, num_zeros_in_grad = optimizer.step()
     timers('optimizer').stop()
 
     if args.vision_pretraining and args.vision_pretraining_type == "dino":
