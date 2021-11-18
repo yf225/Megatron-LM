@@ -25,9 +25,14 @@ _MAX_DATA_DIM = 5
 
 def _check_data_types(keys, data, target_dtype):
     """Check that all the keys have the same target data type."""
-    for key in keys:
-        assert data[key].dtype == target_dtype, '{} has data type {} which '\
-            'is different than {}'.format(key, data[key].dtype, target_dtype)
+    if isinstance(target_dtype, list):
+        for key, dtype in zip(keys, target_dtype):
+            assert data[key].dtype == dtype, '{} has data type {} which '\
+                'is different than {}'.format(key, data[key].dtype, dtype)
+    else:
+        for key in keys:
+            assert data[key].dtype == target_dtype, '{} has data type {} which '\
+                'is different than {}'.format(key, data[key].dtype, target_dtype)
 
 
 def _build_key_size_numel_dictionaries(keys, data):
@@ -81,7 +86,7 @@ def broadcast_data(keys, data, datatype):
         keys: list of keys in the data disctionary to be broadcasted
         data: data dictionary of string keys and cpu tensor values.
         datatype: torch data type of all tensors in data associated
-                  with keys.
+                  with keys. Can be a single dtype, or a list of dtypes which matches the keys list.
     """
     # Build (key, size) and (key, number of elements) dictionaries along
     # with the total number of elements on all ranks.
