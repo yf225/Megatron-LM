@@ -983,7 +983,7 @@ def build_train_valid_test_data_iterators(
         # Build the datasets.
         train_ds, valid_ds, test_ds = build_train_valid_test_datasets_provider(
             train_val_test_num_samples)
-        print_rank_0("train_ds: {}, valid_ds: {}, test_ds: {}".format(train_ds, valid_ds, test_ds))
+        print_rank_last("train_ds: {}, valid_ds: {}, test_ds: {}".format(train_ds, valid_ds, test_ds))
 
         # Build dataloders.
         train_dataloader = build_pretraining_data_loader(
@@ -991,7 +991,7 @@ def build_train_valid_test_data_iterators(
         valid_dataloader = build_pretraining_data_loader(
             valid_ds, args.consumed_valid_samples)
         test_dataloader = build_pretraining_data_loader(test_ds, 0)
-        print_rank_0("train_dataloader: {}, valid_dataloader: {}, test_dataloader: {}".format(train_dataloader, valid_dataloader, test_dataloader))
+        print_rank_last("train_dataloader: {}, valid_dataloader: {}, test_dataloader: {}".format(train_dataloader, valid_dataloader, test_dataloader))
 
         # Flags to know if we need to do training/validation/testing.
         do_train = train_dataloader is not None and args.train_iters > 0
@@ -1033,5 +1033,5 @@ def build_train_valid_test_data_iterators(
     else:
         test_data_iterator = None
 
-    print_rank_0("train_data_iterator: {}, valid_data_iterator: {}, test_data_iterator: {}".format(train_data_iterator, valid_data_iterator, test_data_iterator))
+    print_rank_last("train_data_iterator: {}, valid_data_iterator: {}, test_data_iterator: {}".format(train_data_iterator, valid_data_iterator, test_data_iterator))
     return train_data_iterator, valid_data_iterator, test_data_iterator
