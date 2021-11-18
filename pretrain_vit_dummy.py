@@ -76,6 +76,14 @@ def forward_step(data_iterator, model):
     return output_tensor, partial(loss_func, labels)
 
 
+class VitDummyDataset(torch.utils.data.Dataset):
+    def __init__(self, crop_size=224):
+        self.crop_size = crop_size
+
+    def __getitem__(self, index):
+        return torch.randn(1, crop_size, crop_size, 3)
+
+
 def build_train_valid_datasets_dummy(data_path, crop_size=224, color_jitter=True):
 
     # # training dataset
@@ -97,7 +105,7 @@ def build_train_valid_datasets_dummy(data_path, crop_size=224, color_jitter=True
     # train_data = datasets.ImageFolder(
     #     root=train_data_path, transform=transform_train
     # )
-    train_data = []
+    train_data = VitDummyDataset()
 
     # # validation dataset
     # val_data_path = os.path.join(data_path[0], "val")
