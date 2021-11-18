@@ -84,7 +84,7 @@ class VitDummyDataset(torch.utils.data.Dataset):
         return 100000
 
     def __getitem__(self, index):
-        return (torch.randn(1, self.crop_size, self.crop_size, 3), 1)
+        return (torch.randn(self.crop_size, self.crop_size, 3), 1)
 
 
 def build_train_valid_datasets_dummy(data_path, crop_size=224, color_jitter=True):
