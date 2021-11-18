@@ -20,6 +20,7 @@ import math
 import sys
 import time
 import os
+import numa
 # The earliest we can measure the start time.
 _TRAIN_START_TIME = time.time()
 import torch
@@ -104,6 +105,12 @@ def pretrain(train_valid_test_dataset_provider,
                         args_defaults=args_defaults)
     # Set pytorch JIT layer fusion options and warmup JIT functions.
     set_jit_fusion_options()
+
+    # Add NUMA binding
+    num_sockets = 2  # `grep "physical id"  /proc/cpuinfo | sort -u | wc -l`
+    socket_id = torch.distributed.get_rank() // (8 // num_sockets)
+    node_mask = set([socket_id])
+    numa.bind(node_mask)
 
     # Adjust the startup time so it reflects the largest value.
     # This will be closer to what scheduler will see (outside of
