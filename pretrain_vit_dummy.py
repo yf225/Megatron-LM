@@ -38,6 +38,7 @@ def model_provider(pre_process=True, post_process=True):
 
 def get_batch(data_iterator):
     """Build the batch."""
+    print("data_iterator: ", data_iterator)
     data = next(data_iterator)
 
     # only data parallelism; no need for broadcast
