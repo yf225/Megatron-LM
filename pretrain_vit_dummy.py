@@ -51,7 +51,7 @@ def get_batch(data_iterator):
     data_b = mpu.broadcast_data(keys, data, datatype)
 
     images = data_b["image"]
-    labels = data_b["label"]
+    labels = data_b["label"].to(torch.long)
     assert images.shape[0] == args.micro_batch_size
 
     return images, labels
