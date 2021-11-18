@@ -56,6 +56,8 @@ from megatron.schedules import get_forward_backward_func
 from megatron.utils import report_memory
 from megatron.model.vision.knn_monitor import compute_feature_bank
 
+should_profile = False
+
 
 def print_datetime(string):
     """Note that this call will sync across all ranks."""
@@ -172,24 +174,26 @@ def pretrain(train_valid_test_dataset_provider,
         register_module_forward_pre_hook(recorder_enter_hook)
         register_module_forward_hook(recorder_exit_hook)
 
-        prof = torch.profiler.profile(
-            activities=[
-                torch.profiler.ProfilerActivity.CPU,
-                torch.profiler.ProfilerActivity.CUDA,
-            ]
-        )
-        prof.start()
+        if should_profile:
+            prof = torch.profiler.profile(
+                activities=[
+                    torch.profiler.ProfilerActivity.CPU,
+                    torch.profiler.ProfilerActivity.CUDA,
+                ]
+            )
+            prof.start()
 
         iteration = train(forward_step_func,
                           model, optimizer, opt_param_scheduler,
                           train_data_iterator, valid_data_iterator,
                           process_non_loss_data_func)
 
-        prof.stop()
-        trace_dir_path = "megatron_trace"
-        if not os.path.isdir(trace_dir_path):
-            os.mkdir(trace_dir_path)
-        prof.export_chrome_trace(os.path.join(trace_dir_path, "trace_{}_{}.json".format(str(int(time.time())), str(torch.distributed.get_rank()))))
+        if should_profile:
+            prof.stop()
+            trace_dir_path = "megatron_trace"
+            if not os.path.isdir(trace_dir_path):
+                os.mkdir(trace_dir_path)
+            prof.export_chrome_trace(os.path.join(trace_dir_path, "trace_{}_{}.json".format(str(int(time.time())), str(torch.distributed.get_rank()))))
     print_datetime('after training is done')
 
     if args.do_valid:
