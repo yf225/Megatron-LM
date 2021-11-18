@@ -88,7 +88,7 @@ class VitDummyDataset(torch.utils.data.Dataset):
         return (torch.randn(3, self.crop_size, self.crop_size), 1)
 
 
-def build_train_valid_datasets_dummy(data_path, crop_size=224, color_jitter=True):
+def build_train_valid_datasets_dummy(crop_size=224):
 
     # # training dataset
     # train_data_path = os.path.join(data_path[0], "train")
@@ -139,7 +139,7 @@ def train_valid_test_datasets_provider(train_val_test_num_samples):
     print_rank_0(
         "> building train, validation, and test datasets " "for VIT ..."
     )
-    train_ds, valid_ds, test_ds = build_train_valid_datasets_dummy(data_path=args.data_path)
+    train_ds, valid_ds, test_ds = build_train_valid_datasets_dummy()
     print_rank_0("> finished creating VIT datasets ...")
 
     return train_ds, valid_ds, test_ds
