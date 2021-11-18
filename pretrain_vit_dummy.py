@@ -38,11 +38,23 @@ def model_provider(pre_process=True, post_process=True):
 
 def get_batch(data_iterator):
     """Build the batch."""
-    data = next(data_iterator)
+    args = get_args()
 
-    # only data parallelism; no need for broadcast
-    images = data[0].cuda()
-    labels = data[1].cuda()
+    # Broadcast data.
+    keys = ["image", "label"]
+    datatype = torch.float
+    if data_iterator is not None:
+        data = next(data_iterator)
+    else:
+        data = None
+    data_b = mpu.broadcast_data(keys, data, datatype)
+
+    images = data_b["image"]
+    labels = data_b["label"]
+    print("images.shape: ", images.shape)
+
+    # assert tokens.shape[0] == args.micro_batch_size
+    # assert tokens.shape[1] == args.seq_length
 
     return images, labels
 
@@ -84,8 +96,10 @@ class VitDummyDataset(torch.utils.data.Dataset):
         return 10000000
 
     def __getitem__(self, index):
-        return (torch.randn(3, self.crop_size, self.crop_size), 1)
-
+        return {
+            "image": torch.randn(3, self.crop_size, self.crop_size),
+            "label": 1.0,
+        }
 
 def build_train_valid_datasets_dummy(crop_size=224):
 
