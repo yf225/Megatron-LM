@@ -43,7 +43,7 @@ def get_batch(data_iterator):
 
     # Broadcast data.
     keys = ["image", "label"]
-    datatype = torch.long
+    datatype = torch.half
     if data_iterator is not None:
         data = next(data_iterator)
     else:
@@ -95,8 +95,8 @@ class VitDummyDataset(torch.utils.data.Dataset):
 
     def __getitem__(self, index):
         return {
-            "image": torch.randint(0, 1, (3, self.crop_size, self.crop_size)).to(torch.long),
-            "label": torch.tensor(1).to(torch.long),
+            "image": torch.rand(3, self.crop_size, self.crop_size).to(torch.half),
+            "label": torch.tensor(1.).to(torch.half),
         }
 
 def build_train_valid_datasets_dummy(crop_size=224):
