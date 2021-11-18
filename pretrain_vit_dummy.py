@@ -81,7 +81,7 @@ class VitDummyDataset(torch.utils.data.Dataset):
         self.crop_size = crop_size
 
     def __len__(self):
-        return 100000
+        return 10000000
 
     def __getitem__(self, index):
         return (torch.randn(3, self.crop_size, self.crop_size), 1)
