@@ -497,7 +497,7 @@ def bias_dropout_add(x, bias, residual, prob, training):
     # out = torch.nn.functional.dropout(x + bias, p=prob, training=training)
     # out = residual + out
     # return out
-    return residual + x + bias
+    return x
 
 
 def get_bias_dropout_add(training):
