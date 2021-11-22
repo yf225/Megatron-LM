@@ -181,7 +181,7 @@ def pretrain(train_valid_test_dataset_provider,
                     torch.profiler.ProfilerActivity.CUDA,
                 ]
             )
-            prof.start()
+            prof.__enter__()
 
         iteration = train(forward_step_func,
                           model, optimizer, opt_param_scheduler,
@@ -189,7 +189,7 @@ def pretrain(train_valid_test_dataset_provider,
                           process_non_loss_data_func)
 
         if should_profile:
-            prof.stop()
+            prof.__exit__(None, None, None)
             trace_dir_path = "megatron_trace"
             if not os.path.isdir(trace_dir_path):
                 os.mkdir(trace_dir_path)
