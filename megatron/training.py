@@ -19,6 +19,7 @@ from datetime import datetime
 import math
 import sys
 import time
+import statistics
 import os
 # import numa
 # The earliest we can measure the start time.
