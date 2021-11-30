@@ -43,14 +43,9 @@ VIT_ARGS="\
         --max-position-embeddings 196 \
         --fp16"
 
-clear && clear
+HOME_DIR=/fsx/users/willfeng
 
-# If AWS cluster
-# HOME_DIR=/fsx/users/willfeng
-# If FRL DGX cluster
-HOME_DIR=/mnt/home/willfeng
-
-DISTRIBUTED_ARGS="--nproc_per_node 8 \
+DISTRIBUTED_ARGS="--nproc_per_node 4 \
                   --nnodes ${NUM_NODES} \
                   --node_rank 0 \
                   --master_addr localhost \
