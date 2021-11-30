@@ -1,22 +1,17 @@
 """
 # On AWS GPU node
 
-echo $CUDA_VISIBLE_DEVICES
-
-export NUM_NODES=1
-
-# ViT-H/16
 VIT_ARGS="\
         --num-attention-heads 16 \
         --hidden-size 1280 \
         --num-layers 32 \
         --tensor-model-parallel-size 1 \
         --pipeline-model-parallel-size 1 \
-        `# --num-gpus 8` \
-        --global-batch-size 1024 \
-        `# --data-parallel-size 8` \
+        `# --num-gpus 4` \
+        --global-batch-size 16 \
+        `# --data-parallel-size 4` \
         `# --num-micro-batches 1` \
-        --micro-batch-size 128 \
+        --micro-batch-size 4 \
         --DDP-impl local \
         --no-contiguous-buffers-in-local-ddp \
         `# --activations-checkpoint-method uniform` \
@@ -41,12 +36,13 @@ VIT_ARGS="\
     \
         --seq-length 196 \
         --max-position-embeddings 196 \
-        --fp16"
+        --fp16 \
+        --fp16-lm-cross-entropy"
 
 HOME_DIR=/fsx/users/willfeng
 
 DISTRIBUTED_ARGS="--nproc_per_node 4 \
-                  --nnodes ${NUM_NODES} \
+                  --nnodes 1 \
                   --node_rank 0 \
                   --master_addr localhost \
                   --master_port 6100"
