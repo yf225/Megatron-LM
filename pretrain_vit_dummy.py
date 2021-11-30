@@ -4,48 +4,50 @@
 conda activate torch-nightly
 
 python -m torch.distributed.launch \
-    --nproc_per_node 4 \
-    --nnodes 1 \
-    --node_rank 0 \
-    --master_addr localhost \
-    --master_port 6100 \
+--nproc_per_node 4 \
+--nnodes 1 \
+--node_rank 0 \
+--master_addr localhost \
+--master_port 6100 \
 /fsx/users/willfeng/repos/Megatron-LM/pretrain_vit_dummy.py \
-    --num-attention-heads 16 \
-    --hidden-size 1280 \
-    --num-layers 32 \
-    --tensor-model-parallel-size 1 \
-    --pipeline-model-parallel-size 1 \
-    `# --num-gpus 4` \
-    --global-batch-size 16 \
-    `# --data-parallel-size 4` \
-    `# --num-micro-batches 1` \
-    --micro-batch-size 4 \
-    --DDP-impl local \
-    --no-contiguous-buffers-in-local-ddp \
-    `# --activations-checkpoint-method uniform` \
-    `# --distribute-checkpointed-activations` \
-    `# --empty-unused-memory-level 2` \
+--num-attention-heads 16 \
+--hidden-size 1280 \
+--num-layers 32 \
+--tensor-model-parallel-size 1 \
+--pipeline-model-parallel-size 1 \
+--attention-dropout 0.0 \
+--hidden-dropout 0.0 \
+`# --num-gpus 4` \
+--global-batch-size 16 \
+`# --data-parallel-size 4` \
+`# --num-micro-batches 1` \
+--micro-batch-size 4 \
+--DDP-impl local \
+--no-contiguous-buffers-in-local-ddp \
+`# --activations-checkpoint-method uniform` \
+`# --distribute-checkpointed-activations` \
+`# --empty-unused-memory-level 2` \
 \
-    --train-iters 10 \
-    --lr-decay-iters 320000 \
-    --data-impl mmap \
-    --split 949,50,1 \
-    --lr 0.00015 \
-    --lr-decay-style cosine \
-    --min-lr 1.0e-5 \
-    --weight-decay 1e-2 \
-    --clip-grad 1.0 \
-    --lr-warmup-fraction .01 \
-    --log-interval 1 \
-    --save-interval 10000 \
-    --eval-interval 1000 \
-    --eval-iters 1 \
-    --distributed-backend nccl \
+--train-iters 10 \
+--lr-decay-iters 320000 \
+--data-impl mmap \
+--split 949,50,1 \
+--lr 0.00015 \
+--lr-decay-style cosine \
+--min-lr 1.0e-5 \
+--weight-decay 1e-2 \
+--clip-grad 1.0 \
+--lr-warmup-fraction .01 \
+--log-interval 1 \
+--save-interval 10000 \
+--eval-interval 1000 \
+--eval-iters 1 \
+--distributed-backend nccl \
 \
-    --seq-length 196 \
-    --max-position-embeddings 196 \
-    --fp16 \
-    --fp16-lm-cross-entropy
+--seq-length 196 \
+--max-position-embeddings 196 \
+--fp16 \
+--fp16-lm-cross-entropy
 """
 
 # coding=utf-8
