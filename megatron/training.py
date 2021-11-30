@@ -860,7 +860,7 @@ def train(forward_step_func, model, optimizer, opt_param_scheduler,
         step_duration_list.append(time.time() - step_start_time)
         step_start_time = time.time()
 
-    print_rank_0("micro_batch_size: {}, mean step duration: {:.3f}".format(args.micro_batch_size, statistics.median(step_duration_list)))
+    print_rank_0("micro_batch_size: {}, median step duration (s): {:.3f}".format(args.micro_batch_size, statistics.median(step_duration_list)))
 
     return iteration
 
