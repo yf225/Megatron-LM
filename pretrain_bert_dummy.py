@@ -303,8 +303,8 @@ class BERTDummyDataset(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         sample_list = np.concatenate(
             [
-                # np.array([0]).reshape((1,))
-                np.array([self._dummy_ds[idx] % 10]).reshape((1,))
+                np.array([0]).reshape((1,))
+                # np.array([self._dummy_ds[idx] % 10]).reshape((1,))
                 for idx in range(self.seq_length)
             ]
         ).astype(np.int64)
@@ -316,19 +316,6 @@ class BERTDummyDataset(torch.utils.data.Dataset):
             "labels": np.zeros(self.seq_length, dtype=np.int64),
             "padding_mask": np.ones(self.seq_length, dtype=np.int64),
         }
-
-        # padding_mask_np = np.array([1] * num_tokens + [0] * padding_length,
-        #                        dtype=np.int64)
-
-        # # Lables and loss mask.
-        # labels = [-1] * max_seq_length
-        # loss_mask = [0] * max_seq_length
-        # for i in range(len(masked_positions)):
-        #     assert masked_positions[i] < num_tokens
-        #     labels[masked_positions[i]] = masked_labels[i]
-        #     loss_mask[masked_positions[i]] = 1
-        # labels_np = np.array(labels, dtype=np.int64)
-        # loss_mask_np = np.array(loss_mask, dtype=np.int64)
 
 
 def model_provider(pre_process=True, post_process=True):
@@ -376,6 +363,7 @@ def get_batch(data_iterator):
 
 def loss_func(loss_mask, sentence_order, output_tensor):
     lm_loss_, sop_logits = output_tensor
+    assert sop_logits is None, "sop_logits not supported in this experiment"
 
     lm_loss_ = lm_loss_.float()
     loss_mask = loss_mask.float()
