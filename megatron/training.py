@@ -599,6 +599,7 @@ def training_log(loss_dict, total_loss_dict, learning_rate, iteration,
                 key, torch.cuda.FloatTensor([0.0])) + loss_dict[key]
         else:
             value = loss_dict[key].float().sum().item()
+            print("value: ", value)
             is_nan = value == float('inf') or \
                      value == -float('inf') or \
                      value != value
