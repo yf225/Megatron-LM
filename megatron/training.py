@@ -581,6 +581,7 @@ def training_log(loss_dict, total_loss_dict, learning_rate, iteration,
     advanced_iters_key = 'advanced iterations'
     skipped_iters_key = 'skipped iterations'
     nan_iters_key = 'nan iterations'
+    print("total_loss_dict: ", total_loss_dict)
     # Advanced iterations.
     if not skipped_iter:
         total_loss_dict[advanced_iters_key] = total_loss_dict.get(
