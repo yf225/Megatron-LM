@@ -368,17 +368,17 @@ def get_batch(data_iterator):
 def loss_func(loss_mask, sentence_order, output_tensor):
     lm_loss_, sop_logits = output_tensor
     assert sop_logits is None, "sop_logits not supported in this experiment"
-    print("lm_loss_: ", lm_loss_)
+    print_rank_0("lm_loss_: ", lm_loss_)
 
     lm_loss_ = lm_loss_.float()
     loss_mask = loss_mask.float()
     part1 = torch.sum(
         lm_loss_.view(-1) * loss_mask.reshape(-1))
     part2 = loss_mask.sum()
-    print("part1: ", part1)
-    print("part2: ", part2)
+    print_rank_0("part1: ", part1)
+    print_rank_0("part2: ", part2)
     lm_loss = part1 / part2
-    print("lm_loss: ", lm_loss)
+    print_rank_0("lm_loss: ", lm_loss)
 
     if sop_logits is not None:
         sop_loss = F.cross_entropy(sop_logits.view(-1, 2).float(),

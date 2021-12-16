@@ -581,7 +581,6 @@ def training_log(loss_dict, total_loss_dict, learning_rate, iteration,
     advanced_iters_key = 'advanced iterations'
     skipped_iters_key = 'skipped iterations'
     nan_iters_key = 'nan iterations'
-    print("total_loss_dict: ", total_loss_dict)
     # Advanced iterations.
     if not skipped_iter:
         total_loss_dict[advanced_iters_key] = total_loss_dict.get(
@@ -600,12 +599,9 @@ def training_log(loss_dict, total_loss_dict, learning_rate, iteration,
                 key, torch.cuda.FloatTensor([0.0])) + loss_dict[key]
         else:
             value = loss_dict[key].float().sum().item()
-            print("value: ", value)
             is_nan = value == float('inf') or \
                      value == -float('inf') or \
                      value != value
-            if is_nan:
-                print("nan value: ", loss_dict[key])
             got_nan = got_nan or is_nan
     total_loss_dict[nan_iters_key] = total_loss_dict.get(
         nan_iters_key, 0) + int(got_nan)
