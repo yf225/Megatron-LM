@@ -313,11 +313,10 @@ class BERTDummyDataset(torch.utils.data.Dataset):
 def model_provider(pre_process=True, post_process=True):
     """Build the model."""
 
-    assert args.bert_binary_head == False, "bert_binary_head is not supported in this experiment"
-
     print_rank_0('building BERT model ...')
 
     args = get_args()
+    assert args.bert_binary_head == False, "bert_binary_head is not supported in this experiment"
     num_tokentypes = 2 if args.bert_binary_head else 0
     model = BertModel(
         num_tokentypes=num_tokentypes,
