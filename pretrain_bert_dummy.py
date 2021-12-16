@@ -305,7 +305,7 @@ class BERTDummyDataset(torch.utils.data.Dataset):
             [
                 np.array([0]).reshape((1,))
                 # np.array([self._dummy_ds[idx] % 10]).reshape((1,))
-                for idx in range(self.seq_length + 1)
+                for idx in range(self.seq_length)
             ]
         ).astype(np.int64)
         return {
