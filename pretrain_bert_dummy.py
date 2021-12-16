@@ -375,6 +375,8 @@ def loss_func(loss_mask, sentence_order, output_tensor):
     part1 = torch.sum(
         lm_loss_.view(-1) * loss_mask.reshape(-1))
     part2 = loss_mask.sum()
+    print("part1: ", part1)
+    print("part2: ", part2)
     lm_loss = part1 / part2
     print("lm_loss: ", lm_loss)
 
