@@ -331,7 +331,9 @@ def model_provider(pre_process=True, post_process=True):
         add_binary_head=args.bert_binary_head,
         parallel_output=True,
         pre_process=pre_process,
-        post_process=post_process)
+        post_process=post_process,
+        init_method=torch.nn.init.zeros_,
+        scaled_init_method=torch.nn.init.zeros_)
 
     return model
 

@@ -140,7 +140,9 @@ class BertModel(MegatronModule):
                  add_binary_head=True,
                  parallel_output=True,
                  pre_process=True,
-                 post_process=True):
+                 post_process=True,
+                 init_method=None,
+                 scaled_init_method=None):
         super(BertModel, self).__init__()
         args = get_args()
 
@@ -150,9 +152,11 @@ class BertModel(MegatronModule):
         self.pre_process = pre_process
         self.post_process = post_process
 
-        init_method = init_method_normal(args.init_method_std)
-        scaled_init_method = scaled_init_method_normal(args.init_method_std,
-                                                       args.num_layers)
+        if init_method is None:
+            init_method = init_method_normal(args.init_method_std)
+        if scaled_init_method is None:
+            scaled_init_method = scaled_init_method_normal(args.init_method_std,
+                                                           args.num_layers)
 
         self.language_model, self._language_model_key = get_language_model(
             num_tokentypes=num_tokentypes,
