@@ -307,7 +307,27 @@ class BERTDummyDataset(torch.utils.data.Dataset):
                 for idx in range(self.seq_length + 1)
             ]
         ).astype(np.int64)
-        return {"text": sample_list}
+        return {
+            "text": sample_list,
+            "types": np.zeros_like(sample_list),
+            "is_random": np.arange(self.seq_length).astype(dtype=np.int64),
+            "loss_mask": np.array([0] * self.seq_length, dtype=np.float),
+            "labels": np.array([0] * self.seq_length, dtype=np.int64),
+            "padding_mask": np.array([1] * self.seq_length, dtype=np.int64),
+        }
+
+        # padding_mask_np = np.array([1] * num_tokens + [0] * padding_length,
+        #                        dtype=np.int64)
+
+        # # Lables and loss mask.
+        # labels = [-1] * max_seq_length
+        # loss_mask = [0] * max_seq_length
+        # for i in range(len(masked_positions)):
+        #     assert masked_positions[i] < num_tokens
+        #     labels[masked_positions[i]] = masked_labels[i]
+        #     loss_mask[masked_positions[i]] = 1
+        # labels_np = np.array(labels, dtype=np.int64)
+        # loss_mask_np = np.array(loss_mask, dtype=np.int64)
 
 
 def model_provider(pre_process=True, post_process=True):
