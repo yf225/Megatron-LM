@@ -375,10 +375,10 @@ def loss_func(loss_mask, sentence_order, output_tensor):
     part1 = torch.sum(
         lm_loss_.view(-1) * loss_mask.reshape(-1))
     part2 = loss_mask.sum()
-    print_rank_0("part1: ", part1)
-    print_rank_0("part2: ", part2)
+    print_rank_0("part1: " + str(part1))
+    print_rank_0("part2: " + str(part2))
     lm_loss = part1 / part2
-    print_rank_0("lm_loss: ", lm_loss)
+    print_rank_0("lm_loss: " + str(lm_loss))
 
     if sop_logits is not None:
         sop_loss = F.cross_entropy(sop_logits.view(-1, 2).float(),
