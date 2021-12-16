@@ -311,7 +311,7 @@ class BERTDummyDataset(torch.utils.data.Dataset):
             "text": sample_list,
             "types": np.zeros_like(sample_list),
             "is_random": np.arange(self.seq_length).astype(dtype=np.int64),
-            "loss_mask": np.array([0] * self.seq_length, dtype=np.float),
+            "loss_mask": np.array([0] * self.seq_length, dtype=np.int64),
             "labels": np.array([0] * self.seq_length, dtype=np.int64),
             "padding_mask": np.array([1] * self.seq_length, dtype=np.int64),
         }
