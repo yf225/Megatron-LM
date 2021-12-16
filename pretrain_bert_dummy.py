@@ -303,7 +303,7 @@ class BERTDummyDataset(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         sample_list = np.concatenate(
             [
-                np.array(self._dummy_ds[idx]).reshape((1,))
+                np.array(self._dummy_ds[idx] % 10).reshape((1,))
                 for idx in range(self.seq_length + 1)
             ]
         ).astype(np.int64)
