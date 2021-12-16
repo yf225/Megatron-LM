@@ -368,7 +368,7 @@ def get_batch(data_iterator):
 def loss_func(loss_mask, sentence_order, output_tensor):
     lm_loss_, sop_logits = output_tensor
     assert sop_logits is None, "sop_logits not supported in this experiment"
-    print_rank_0("lm_loss_: ", lm_loss_)
+    print_rank_0("lm_loss_: " + str(lm_loss_))
 
     lm_loss_ = lm_loss_.float()
     loss_mask = loss_mask.float()
