@@ -372,8 +372,10 @@ def loss_func(loss_mask, sentence_order, output_tensor):
 
     lm_loss_ = lm_loss_.float()
     loss_mask = loss_mask.float()
-    lm_loss = torch.sum(
-        lm_loss_.view(-1) * loss_mask.reshape(-1)) / loss_mask.sum()
+    part1 = torch.sum(
+        lm_loss_.view(-1) * loss_mask.reshape(-1))
+    part2 = loss_mask.sum()
+    lm_loss = part1 / part2
     print("lm_loss: ", lm_loss)
 
     if sop_logits is not None:
