@@ -604,6 +604,8 @@ def training_log(loss_dict, total_loss_dict, learning_rate, iteration,
             is_nan = value == float('inf') or \
                      value == -float('inf') or \
                      value != value
+            if is_nan:
+                print("nan value: ", loss_dict[key])
             got_nan = got_nan or is_nan
     total_loss_dict[nan_iters_key] = total_loss_dict.get(
         nan_iters_key, 0) + int(got_nan)
