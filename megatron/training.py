@@ -512,7 +512,7 @@ def train_step(forward_step_func, data_iterator,
                 grad = word_embeddings_weight.grad
             torch.distributed.all_reduce(grad, group=mpu.get_embedding_group())
 
-    # All-reduce position_embeddings grad across first (encoder) and split (decoder) 
+    # All-reduce position_embeddings grad across first (encoder) and split (decoder)
     # stages to ensure that position embeddings parameters stay in sync.
     # This should only run for T5 models with pipeline parallelism
     if mpu.is_rank_in_position_embedding_group() and \

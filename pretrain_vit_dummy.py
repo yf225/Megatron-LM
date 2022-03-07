@@ -1,55 +1,3 @@
-"""
-# On AWS GPU node
-
-conda activate torch-nightly
-
-python -m torch.distributed.launch \
---nproc_per_node 4 \
---nnodes 1 \
---node_rank 0 \
---master_addr localhost \
---master_port 6100 \
-/fsx/users/willfeng/repos/Megatron-LM/pretrain_vit_dummy.py \
---num-attention-heads 16 \
---hidden-size 1280 \
---num-layers 32 \
---tensor-model-parallel-size 1 \
---pipeline-model-parallel-size 1 \
---attention-dropout 0.0 \
---hidden-dropout 0.0 \
-`# --num-gpus 4` \
---global-batch-size 16 \
-`# --data-parallel-size 4` \
-`# --num-micro-batches 1` \
---micro-batch-size 4 \
---DDP-impl local \
---no-contiguous-buffers-in-local-ddp \
-`# --activations-checkpoint-method uniform` \
-`# --distribute-checkpointed-activations` \
-`# --empty-unused-memory-level 2` \
-\
---train-iters 10 \
---lr-decay-iters 320000 \
---data-impl mmap \
---split 949,50,1 \
---lr 0.00015 \
---lr-decay-style cosine \
---min-lr 1.0e-5 \
---weight-decay 1e-2 \
---clip-grad 1.0 \
---lr-warmup-fraction .01 \
---log-interval 1 \
---save-interval 10000 \
---eval-interval 1000 \
---eval-iters 1 \
---distributed-backend nccl \
-\
---seq-length 196 \
---max-position-embeddings 196 \
---fp16 \
---fp16-lm-cross-entropy
-"""
-
 # coding=utf-8
 # Copyright (c) 2020, NVIDIA CORPORATION.  All rights reserved.
 #
@@ -73,9 +21,40 @@ from functools import partial
 from megatron import get_args, get_timers, mpu, print_rank_0
 # from megatron.data.vit_dataset import build_train_valid_datasets
 from megatron.model import ModelType
-from megatron.model.vit_model import VitModel
+from megatron.model.vision.classification import VitClassificationModel
 from megatron.training import pretrain
 from megatron.utils import average_losses_across_data_parallel_group
+
+
+from megatron import arguments as megatron__arguments
+
+_add_data_args_original = megatron__arguments._add_data_args
+
+
+def add_extra_args_to_add_data_args_func(parser):
+    parser = _add_data_args_original(parser)
+    group = parser.add_argument_group(title="data and dataloader")
+    group.add_argument(
+        "--padded-vocab-size", type=int, default=1024, help="TODO(willfeng)"
+    )
+    return parser
+
+
+megatron__arguments._add_data_args = add_extra_args_to_add_data_args_func
+
+
+_add_logging_args_original = megatron__arguments._add_logging_args
+
+
+# HACK(willfeng): added this to be compatible with submitit
+def add_extra_args_to_add_logging_args_func(parser):
+    parser = _add_logging_args_original(parser)
+    group = parser.add_argument_group(title="submitit logging")
+    parser.add_argument("--folder", type=str, default="", help="Folder where the jobs are stored (in subfolder)")
+    return parser
+
+
+megatron__arguments._add_logging_args = add_extra_args_to_add_logging_args_func
 
 
 def model_provider(pre_process=True, post_process=True):
@@ -84,9 +63,9 @@ def model_provider(pre_process=True, post_process=True):
     print_rank_0("building VIT model ...")
     args = get_args()
 
-    model = VitModel(num_classes=args.num_classes,
-                     pre_process=pre_process,
-                     post_process=post_process)
+    model = VitClassificationModel(num_classes=args.num_classes,
+                                   pre_process=pre_process,
+                                   post_process=post_process)
     return model
 
 def get_batch(data_iterator):
@@ -109,8 +88,8 @@ def get_batch(data_iterator):
     return images, labels
 
 def loss_func(labels, output_tensor):
-    logits = output_tensor.contiguous().float()
-    loss = F.cross_entropy(logits, labels)
+    logits = output_tensor
+    loss = F.cross_entropy(logits, labels.long())
 
     outputs = torch.argmax(logits, -1)
     correct = (outputs == labels).float()
@@ -208,8 +187,7 @@ def train_valid_test_datasets_provider(train_val_test_num_samples):
     return train_ds, valid_ds, test_ds
 
 
-if __name__ == "__main__":
-
+def train_model():
     pretrain(
         train_valid_test_datasets_provider,
         model_provider,
@@ -217,3 +195,7 @@ if __name__ == "__main__":
         forward_step,
         args_defaults={'dataloader_type': 'cyclic'}
     )
+
+
+if __name__ == "__main__":
+    train_model()

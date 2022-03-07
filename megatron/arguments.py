@@ -132,6 +132,7 @@ def parse_args(extra_args_provider=None, defaults={},
             setattr(args, key, defaults[key])
 
     # Batch size.
+    print(f"args: {args}")
     assert args.micro_batch_size is not None
     assert args.micro_batch_size > 0
     if args.global_batch_size is None:
@@ -350,7 +351,7 @@ def _add_inference_args(parser):
 
     return parser
 
-    
+
 def _add_network_size_args(parser):
     group = parser.add_argument_group(title='network size')
 
