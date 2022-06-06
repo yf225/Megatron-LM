@@ -17,8 +17,54 @@ import pretrain_bert_dummy
 # _submit.py: error: unrecognized arguments: /fsx-mae/willfeng/checkpoints/willfeng/pycls-scale/megatron_tp_pp/vit_120B
 
 """
+BERT-10B:
+
+MODEL_NAME=bert_10B
+RUN_ARGS="\
+        --num-attention-heads 32 \
+        --hidden-size 5120 \
+        --num-layers 32 \
+        --tensor-model-parallel-size 8 \
+        --pipeline-model-parallel-size 1 \
+        `# --num-gpus ${NUM_GPUS}` \
+        --global-batch-size 4096 \
+        `# --data-parallel-size 16` \
+        `# --num-micro-batches 16` \
+        --micro-batch-size 16 \
+        --DDP-impl local \
+        --accumulate-allreduce-grads-in-fp32 \
+        `# --activations-checkpoint-method uniform` \
+        `# --distribute-checkpointed-activations` \
+        `# --empty-unused-memory-level 2` \
+    \
+        --train-iters 10 \
+        --lr-decay-iters 320000 \
+        --data-impl mmap \
+        --split 949,50,1 \
+        --lr 0.00015 \
+        --lr-decay-style cosine \
+        --min-lr 1.0e-5 \
+        --weight-decay 1e-2 \
+        --clip-grad 1.0 \
+        --lr-warmup-fraction .01 \
+        --log-interval 1 \
+        --save-interval 10000 \
+        --eval-interval 1000 \
+        --eval-iters 1 \
+        --distributed-backend nccl \
+        --bert-no-binary-head \
+    \
+        --seq-length 256 \
+        --padded-vocab-size 256 \
+        --max-position-embeddings 256 \
+        --fp16"
+"""
+
+
+"""
 BERT-25B:
 
+MODEL_NAME=bert_25B
 RUN_ARGS="\
         --num-attention-heads 32 \
         --hidden-size 7680 \
@@ -62,22 +108,23 @@ RUN_ARGS="\
 """
 BERT-60B:
 
+MODEL_NAME=bert_60B
 RUN_ARGS="\
         --num-attention-heads 32 \
         --hidden-size 10240 \
         --num-layers 48 \
         --tensor-model-parallel-size 8 \
-        --pipeline-model-parallel-size 8 \
+        --pipeline-model-parallel-size 2 \
         `# --num-gpus ${NUM_GPUS}` \
         --global-batch-size 2048 \
-        `# --data-parallel-size 2` \
-        `# --num-micro-batches 32` \
-        --micro-batch-size 32 \
+        `# --data-parallel-size 8` \
+        `# --num-micro-batches 256` \
+        --micro-batch-size 1 \
         --DDP-impl local \
         --accumulate-allreduce-grads-in-fp32 \
         `# --activations-checkpoint-method uniform` \
         `# --distribute-checkpointed-activations` \
-        --empty-unused-memory-level 2 \
+        `# --empty-unused-memory-level 2` \
     \
         --train-iters 10 \
         --lr-decay-iters 320000 \
@@ -100,13 +147,12 @@ RUN_ARGS="\
         --padded-vocab-size 256 \
         --max-position-embeddings 256 \
         --fp16"
-
-./run_net.py ${NUM_GPUS} ${RUN_ARGS}
 """
 
 """
 BERT-120B:
 
+MODEL_NAME=bert_120B
 RUN_ARGS="\
         --num-attention-heads 80 \
         --hidden-size 10240 \
@@ -159,12 +205,12 @@ RUN_ARGS="\
         --hidden-size 7680 \
         --num-layers 36 \
         --tensor-model-parallel-size 8 \
-        --pipeline-model-parallel-size 8 \
+        --pipeline-model-parallel-size 4 \
         `# --num-gpus ${NUM_GPUS}` \
         --global-batch-size 4096 \
-        `# --data-parallel-size 2` \
+        `# --data-parallel-size 4` \
         `# --num-micro-batches ${num_micro_batches}` \
-        --micro-batch-size $((4096 / 2 / num_micro_batches)) \
+        --micro-batch-size $((4096 / 4 / num_micro_batches)) \
         --DDP-impl local \
         --accumulate-allreduce-grads-in-fp32 \
         `# --activations-checkpoint-method uniform` \
@@ -195,6 +241,52 @@ RUN_ARGS="\
 
 ./run_net.py ${NUM_GPUS} ${MODEL_NAME} ${RUN_ARGS}
 done
+"""
+
+"""
+NUM_GPUS=128
+MODEL_NAME=bert_25B
+
+RUN_ARGS="\
+        --num-attention-heads 32 \
+        --hidden-size 7680 \
+        --num-layers 36 \
+        --tensor-model-parallel-size 8 \
+        --pipeline-model-parallel-size 4 \
+        `# --num-gpus 128` \
+        --global-batch-size 4096 \
+        `# --data-parallel-size 4` \
+        `# --num-micro-batches 64` \
+        --micro-batch-size 16 \
+        --DDP-impl local \
+        --accumulate-allreduce-grads-in-fp32 \
+        `# --activations-checkpoint-method uniform` \
+        `# --distribute-checkpointed-activations` \
+        `# --empty-unused-memory-level 2` \
+    \
+        --train-iters 10 \
+        --lr-decay-iters 320000 \
+        --data-impl mmap \
+        --split 949,50,1 \
+        --lr 0.00015 \
+        --lr-decay-style cosine \
+        --min-lr 1.0e-5 \
+        --weight-decay 1e-2 \
+        --clip-grad 1.0 \
+        --lr-warmup-fraction .01 \
+        --log-interval 1 \
+        --save-interval 10000 \
+        --eval-interval 1000 \
+        --eval-iters 1 \
+        --distributed-backend nccl \
+        --bert-no-binary-head \
+    \
+        --seq-length 256 \
+        --padded-vocab-size 256 \
+        --max-position-embeddings 256 \
+        --fp16"
+
+./run_net.py ${NUM_GPUS} ${MODEL_NAME} ${RUN_ARGS}
 """
 
 NUM_GPUS = int(sys.argv[1])
