@@ -115,7 +115,7 @@ def setup_executor(executor, name, num_gpus, **kwargs):
         "nodes": max(1, NUM_GPUS // MAX_GPUS_PER_NODE),
         "timeout_min": 4200,
         "name": name,
-        "slurm_partition": "learnfair",
+        "slurm_partition": "scavenge", # learnfair
         "slurm_comment": "",
         "slurm_additional_parameters": slurm_additional_parameters,
     }
