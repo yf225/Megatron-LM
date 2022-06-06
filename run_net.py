@@ -14,8 +14,6 @@ import distributed as dist
 import pretrain_bert_dummy 
 
 
-# _submit.py: error: unrecognized arguments: /fsx-mae/willfeng/checkpoints/willfeng/pycls-scale/megatron_tp_pp/vit_120B
-
 """
 BERT-10B:
 

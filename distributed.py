@@ -22,16 +22,16 @@ import torch
 import argparse
 
 
-# HACK(willfeng): patch submitit to add "--folder" before the folder argument.
-# NOTE: make sure to also edit submitit/core/submission.py submitit_main() function to accept `--folder` arg.
-# e.g.
-"""
-def submitit_main() -> None:
+def submitit_main_patched() -> None:
     parser = argparse.ArgumentParser(description="Run a job")
     parser.add_argument("--folder", type=str, help="Folder where the jobs are stored (in subfolder)")
     args, unknown = parser.parse_known_args()
     process_job(args.folder)
-"""
+
+
+submitit.core.submission.submitit_main = submitit_main_patched
+
+
 def _submitit_command_str_patched(self) -> str:
     return " ".join(
         [
