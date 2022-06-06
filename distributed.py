@@ -19,6 +19,7 @@ import shlex
 import numpy as np
 import torch
 import argparse
+import submitit
 
 
 # Make work w recent PyTorch versions (https://github.com/pytorch/pytorch/issues/37377)
