@@ -17,9 +17,22 @@ import sys
 import shlex
 
 import numpy as np
+import submitit
 import torch
 import argparse
-import submitit
+
+
+def _submitit_command_str_patched(self) -> str:
+    return " ".join(
+        [
+            shlex.quote(sys.executable),
+            "-u -m megatron._submit",
+            "--folder",
+            shlex.quote(str(self.folder)),
+            *sys.argv[3:],  # NOTE: here we assume that Megatron-specific arguments starts at 3rd argument in the original shell command
+        ]
+    )
+setattr(submitit.SlurmExecutor, '_submitit_command_str', property(_submitit_command_str_patched))
 
 
 # Make work w recent PyTorch versions (https://github.com/pytorch/pytorch/issues/37377)
