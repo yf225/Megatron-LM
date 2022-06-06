@@ -29,6 +29,7 @@ def submitit_main_patched() -> None:
     process_job(args.folder)
 
 
+import submitit.core
 submitit.core.submission.submitit_main = submitit_main_patched
 
 
