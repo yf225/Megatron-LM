@@ -83,8 +83,8 @@ def multi_proc_run(num_proc, model_name, fun, use_spawn=False):
     MODEL_NAME = model_name
     MODE = "slurm"
     MAX_RETRY = 3
-    NAME = "pycls_job"
-    OUT_DIR = f"/fsx-mae/willfeng/checkpoints/willfeng/pycls-scale/megatron_tp_pp/{MODEL_NAME}"
+    NAME = "megatron_job"
+    OUT_DIR = f"{os.environ["HOME"]}/checkpoints/{os.environ["USER"]}/megatron_tp_pp/{MODEL_NAME}"
     PORT_RANGE = [10000, 65000]
     NUM_GPUS = num_proc
 
