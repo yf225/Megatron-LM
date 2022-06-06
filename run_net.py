@@ -111,6 +111,7 @@ RUN_ARGS="\
         --padded-vocab-size 256 \
         --max-position-embeddings 256 \
         --fp16"
+./run_net.py ${NUM_GPUS} ${MODEL_NAME} ${RUN_ARGS}
 """
 
 
@@ -157,6 +158,7 @@ RUN_ARGS="\
         --padded-vocab-size 256 \
         --max-position-embeddings 256 \
         --fp16"
+./run_net.py ${NUM_GPUS} ${MODEL_NAME} ${RUN_ARGS}
 """
 
 """
@@ -202,6 +204,7 @@ RUN_ARGS="\
         --padded-vocab-size 256 \
         --max-position-embeddings 256 \
         --fp16"
+./run_net.py ${NUM_GPUS} ${MODEL_NAME} ${RUN_ARGS}
 """
 
 """
@@ -247,6 +250,7 @@ RUN_ARGS="\
         --padded-vocab-size 256 \
         --max-position-embeddings 256 \
         --fp16"
+./run_net.py ${NUM_GPUS} ${MODEL_NAME} ${RUN_ARGS}
 """
 
 
