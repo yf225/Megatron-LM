@@ -19,9 +19,10 @@ FAIR AWS cluster:
 
 Reference: https://fb.workplace.com/groups/aws.fair.discuss/posts/1009185456666472/
 
-# FIRST RUN: rsync the `dino_env_2022_04_12_py39_pt111_cu114` env from
-# /data/home/vkhalidov/miniconda/envs/dino_env_2022_04_12_py39_pt111_cu114 to your local conda
-# e.g. rsync -avr /data/home/vkhalidov/miniconda/envs/dino_env_2022_04_12_py39_pt111_cu114 <your_conda_path>/envs/dino_env_2022_04_12_py39_pt111_cu114
+# FIRST RUN ONLY:
+# 1. Rsync the `dino_env_2022_04_12_py39_pt111_cu114` env from /data/home/vkhalidov/miniconda/envs/dino_env_2022_04_12_py39_pt111_cu114 to your local conda
+#   e.g. rsync -avr /data/home/vkhalidov/miniconda/envs/dino_env_2022_04_12_py39_pt111_cu114 <your_conda_path>/envs/dino_env_2022_04_12_py39_pt111_cu114
+# 2. Install the apex library: https://github.com/NVIDIA/apex
 
 conda activate dino_env_2022_04_12_py39_pt111_cu114
 export MODULEPATH=/data/home/vkhalidov/modulefiles:$MODULEPATH
