@@ -14,6 +14,29 @@ import distributed as dist
 import pretrain_bert_dummy 
 
 
+def submitit_main_patched() -> None:
+    parser = argparse.ArgumentParser(description="Run a job")
+    parser.add_argument("--folder", type=str, help="Folder where the jobs are stored (in subfolder)")
+    args, unknown = parser.parse_known_args()
+    process_job(args.folder)
+from submitit.core import submission
+submission.submitit_main = submitit_main_patched
+
+
+import submitit
+def _submitit_command_str_patched(self) -> str:
+    return " ".join(
+        [
+            shlex.quote(sys.executable),
+            "-u -m submitit.core._submit",
+            "--folder",
+            shlex.quote(str(self.folder)),
+            *sys.argv[3:],  # NOTE: here we assume that Megatron-specific arguments starts at 3rd argument in the original shell command
+        ]
+    )
+setattr(submitit.SlurmExecutor, '_submitit_command_str', property(_submitit_command_str_patched))
+
+
 """
 FAIR AWS cluster:
 
