@@ -12,6 +12,8 @@ import sys
 
 import distributed as dist
 import pretrain_bert_dummy 
+import sys
+import shlex
 
 
 def submitit_main_patched() -> None:
