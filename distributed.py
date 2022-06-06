@@ -17,6 +17,7 @@ import sys
 import shlex
 
 import numpy as np
+import submitit
 import torch
 import argparse
 
@@ -26,11 +27,9 @@ def submitit_main_patched() -> None:
     parser.add_argument("--folder", type=str, help="Folder where the jobs are stored (in subfolder)")
     args, unknown = parser.parse_known_args()
     process_job(args.folder)
-import submitit.core
-submitit.core.submission.submitit_main = submitit_main_patched
+from submitit.core import submission
+submission.submitit_main = submitit_main_patched
 
-
-import submitit
 
 def _submitit_command_str_patched(self) -> str:
     return " ".join(
