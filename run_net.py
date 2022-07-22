@@ -253,6 +253,53 @@ RUN_ARGS="\
 ./run_net.py ${NUM_GPUS} ${MODEL_NAME} ${RUN_ARGS}
 """
 
+"""
+BERT-120B dummy optimizer (for Alpa comparison):
+
+NUM_GPUS=64
+MODEL_NAME=bert_120B
+RUN_ARGS="\
+        --optimizer dummy \
+    \
+        --num-attention-heads 80 \
+        --hidden-size 10240 \
+        --num-layers 96 \
+        --tensor-model-parallel-size 8 \
+        --pipeline-model-parallel-size 8 \
+        `# --num-gpus ${NUM_GPUS}` \
+        --global-batch-size 512 \
+        `# --data-parallel-size 1` \
+        `# --num-micro-batches 128` \
+        --micro-batch-size 4 \
+        --DDP-impl local \
+        --activations-checkpoint-method uniform \
+        --distribute-checkpointed-activations \
+        --empty-unused-memory-level 2 \
+    \
+        --train-iters 10 \
+        --lr-decay-iters 320000 \
+        --data-impl mmap \
+        --split 949,50,1 \
+        --lr 0.00015 \
+        --lr-decay-style cosine \
+        --min-lr 1.0e-5 \
+        --weight-decay 1e-2 \
+        --clip-grad 1.0 \
+        --lr-warmup-fraction .01 \
+        --log-interval 1 \
+        --save-interval 10000 \
+        --eval-interval 1000 \
+        --eval-iters 1 \
+        --distributed-backend nccl \
+        --bert-no-binary-head \
+    \
+        --seq-length 256 \
+        --padded-vocab-size 256 \
+        --max-position-embeddings 256 \
+        --fp16"
+./run_net.py ${NUM_GPUS} ${MODEL_NAME} ${RUN_ARGS}
+"""
+
 
 """
 param sweep: 

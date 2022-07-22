@@ -22,6 +22,42 @@ from .grad_scaler import ConstantGradScaler, DynamicGradScaler
 from .optimizer import Float16OptimizerWithFloat16Params, FP32Optimizer
 
 
+class DummyOptimizer(torch.optim.Optimizer):
+    """
+    Dummy optimizer. Performs simple logic:
+    ```
+    for k in params:
+        params[k] = params[k] + params_grad[k] * lr
+        optim_state[k] = optim_state[k] + params_grad[k]
+    ```
+    """
+
+    def __init__(
+        self, params, lr=1e-3
+    ):
+        assert lr > 0
+        defaults = dict(
+            lr=lr,
+        )
+        super().__init__(params, defaults)
+
+    @torch.no_grad()
+    def step(self):
+        for g in self.param_groups:
+            for p in g["params"]:
+                dp = p.grad
+
+                if dp is None:
+                    continue
+
+                param_state = self.state[p]
+                if "p" not in param_state:
+                    param_state["p"] = torch.zeros_like(p)
+                param_state["p"].add_(dp)
+                p.add_(dp * g["lr"])
+
+
+
 def get_param_groups(modules,
                      no_weight_decay_cond,
                      scale_lr_cond,
@@ -95,6 +131,9 @@ def get_megatron_optimizer(model,
                         lr=args.lr,
                         weight_decay=args.weight_decay,
                         momentum=args.sgd_momentum)
+    elif args.optimizer == 'dummy':
+        optimizer = DummyOptimizer(param_groups,
+                        lr=args.lr)
     else:
         raise Exception('{} optimizer is not supported.'.format(
             args.optimizer))
