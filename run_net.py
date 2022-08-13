@@ -5,8 +5,6 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 
-"""Execute various operations (train, test, time, etc.) on a classification model."""
-
 import argparse
 import sys
 
@@ -118,19 +116,19 @@ RUN_ARGS="\
 """
 BERT-25B:
 
-NUM_GPUS=...
+NUM_GPUS=32
 MODEL_NAME=bert_25B
 RUN_ARGS="\
         --num-attention-heads 32 \
         --hidden-size 7680 \
         --num-layers 36 \
         --tensor-model-parallel-size 8 \
-        --pipeline-model-parallel-size 2 \
+        --pipeline-model-parallel-size 4 \
         `# --num-gpus ${NUM_GPUS}` \
-        --global-batch-size 2048 \
-        `# --data-parallel-size 8` \
-        `# --num-micro-batches 32` \
-        --micro-batch-size 16 \
+        --global-batch-size 512 \
+        `# --data-parallel-size 1` \
+        `# --num-micro-batches 4` \
+        --micro-batch-size 128 \
         --DDP-impl local \
         --accumulate-allreduce-grads-in-fp32 \
         `# --activations-checkpoint-method uniform` \
@@ -160,6 +158,59 @@ RUN_ARGS="\
         --fp16"
 ./run_net.py ${NUM_GPUS} ${MODEL_NAME} ${RUN_ARGS}
 """
+
+"""
+BERT-25B dummy optimizer (for Alpa comparison):
+
+NUM_GPUS=32
+MODEL_NAME=bert_25B
+RUN_ARGS="\
+        --optimizer dummy \
+    \
+        --num-attention-heads 32 \
+        --hidden-size 7680 \
+        --num-layers 36 \
+        --tensor-model-parallel-size 8 \
+        --pipeline-model-parallel-size 4 \
+        `# --num-gpus ${NUM_GPUS}` \
+        --global-batch-size 512 \
+        `# --data-parallel-size 1` \
+        `# --num-micro-batches 8` \
+        --micro-batch-size 64 \
+        --DDP-impl local \
+        --recompute-granularity full \
+        --recompute-method uniform \
+        --empty-unused-memory-level 2 \
+    \
+        --train-iters 5 \
+        --lr-decay-iters 320000 \
+        --data-impl mmap \
+        --split 949,50,1 \
+        --lr 0.00015 \
+        --lr-decay-style cosine \
+        --min-lr 1.0e-5 \
+        --weight-decay 1e-2 \
+        --clip-grad 1.0 \
+        --lr-warmup-fraction .01 \
+        --log-interval 1 \
+        --save-interval 10000 \
+        --eval-interval 1000 \
+        --eval-iters 1 \
+        --distributed-backend nccl \
+        --bert-no-binary-head \
+    \
+        --seq-length 256 \
+        --padded-vocab-size 256 \
+        --max-position-embeddings 256 \
+        --fp16"
+./run_net.py ${NUM_GPUS} ${MODEL_NAME} ${RUN_ARGS}
+"""
+# mbs=128, iter time=10245.9
+# mbs=64, iter time=TODO
+# mbs=32, iter time=TODO
+# mbs=16, iter time=TODO
+# mbs=8, iter time=TODO
+# mbs=4, iter time=TODO
 
 """
 BERT-60B:
@@ -206,6 +257,58 @@ RUN_ARGS="\
         --fp16"
 ./run_net.py ${NUM_GPUS} ${MODEL_NAME} ${RUN_ARGS}
 """
+
+"""
+BERT-60B dummy optimizer (for Alpa comparison):
+
+NUM_GPUS=32
+MODEL_NAME=bert_60B
+RUN_ARGS="\
+        --optimizer dummy \
+    \
+        --num-attention-heads 32 \
+        --hidden-size 10240 \
+        --num-layers 48 \
+        --tensor-model-parallel-size 8 \
+        --pipeline-model-parallel-size 4 \
+        `# --num-gpus ${NUM_GPUS}` \
+        --global-batch-size 512 \
+        `# --data-parallel-size 1` \
+        `# --num-micro-batches 128` \
+        --micro-batch-size 4 \
+        --DDP-impl local \
+        --recompute-granularity full \
+        --recompute-method uniform \
+        --empty-unused-memory-level 2 \
+    \
+        --train-iters 10 \
+        --lr-decay-iters 320000 \
+        --data-impl mmap \
+        --split 949,50,1 \
+        --lr 0.00015 \
+        --lr-decay-style cosine \
+        --min-lr 1.0e-5 \
+        --weight-decay 1e-2 \
+        --clip-grad 1.0 \
+        --lr-warmup-fraction .01 \
+        --log-interval 1 \
+        --save-interval 10000 \
+        --eval-interval 1000 \
+        --eval-iters 1 \
+        --distributed-backend nccl \
+        --bert-no-binary-head \
+    \
+        --seq-length 256 \
+        --padded-vocab-size 256 \
+        --max-position-embeddings 256 \
+        --fp16"
+./run_net.py ${NUM_GPUS} ${MODEL_NAME} ${RUN_ARGS}
+"""
+# mbs=32, iter time=14421.5ms
+# mbs=16, iter time=13675.2ms
+# mbs=8, iter time=14159.6ms
+# mbs=4, iter time=17708.8ms
+
 
 """
 BERT-120B:
@@ -269,11 +372,11 @@ RUN_ARGS="\
         `# --num-gpus ${NUM_GPUS}` \
         --global-batch-size 512 \
         `# --data-parallel-size 1` \
-        `# --num-micro-batches 128` \
-        --micro-batch-size 4 \
+        `# --num-micro-batches 32` \
+        --micro-batch-size 16 \
         --DDP-impl local \
-        --activations-checkpoint-method uniform \
-        --distribute-checkpointed-activations \
+        --recompute-granularity full \
+        --recompute-method uniform \
         --empty-unused-memory-level 2 \
     \
         --train-iters 10 \
@@ -299,6 +402,9 @@ RUN_ARGS="\
         --fp16"
 ./run_net.py ${NUM_GPUS} ${MODEL_NAME} ${RUN_ARGS}
 """
+# mbs=16, iter time=15458.1ms
+# mbs=8, iter time=15038.9ms
+# mbs=4, iter time=18113.7ms
 
 
 """
