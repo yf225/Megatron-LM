@@ -313,7 +313,7 @@ RUN_ARGS="\
 """
 BERT-120B:
 
-NUM_GPUS=...
+NUM_GPUS=128
 MODEL_NAME=bert_120B
 RUN_ARGS="\
         --num-attention-heads 80 \
@@ -324,12 +324,15 @@ RUN_ARGS="\
         `# --num-gpus ${NUM_GPUS}` \
         --global-batch-size 2048 \
         `# --data-parallel-size 2` \
-        `# --num-micro-batches 256` \
-        --micro-batch-size 4 \
+        `# --num-micro-batches 64` \
+        --micro-batch-size 16 \
         --DDP-impl local \
-        --activations-checkpoint-method uniform \
+        --recompute-granularity full \
+        --recompute-method uniform \
+        --distribute-saved-activations \
         --accumulate-allreduce-grads-in-fp32 \
-        --distribute-checkpointed-activations \
+        `# --activations-checkpoint-method uniform` \
+        `# --distribute-checkpointed-activations` \
         --empty-unused-memory-level 2 \
     \
         --train-iters 10 \
@@ -355,6 +358,10 @@ RUN_ARGS="\
         --fp16"
 ./run_net.py ${NUM_GPUS} ${MODEL_NAME} ${RUN_ARGS}
 """
+
+Megatron v3.0.2
+mbs=16: /data/home/willfeng/checkpoints/willfeng/megatron_tp_pp/bert_120B/54267 -> working
+
 
 """
 BERT-120B dummy optimizer (for Alpa comparison):
