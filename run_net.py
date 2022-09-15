@@ -268,8 +268,8 @@ RUN_ARGS="\
         `# --num-gpus ${NUM_GPUS}` \
         --global-batch-size 4096 \
         `# --data-parallel-size 1` \
-        `# --num-micro-batches 64` \
-        --micro-batch-size 64 \
+        `# --num-micro-batches 32` \
+        --micro-batch-size 128 \
         --DDP-impl local \
         --accumulate-allreduce-grads-in-fp32 \
         `# --recompute-granularity full` \
@@ -284,7 +284,7 @@ RUN_ARGS="\
         --lr 0.00015 \
         --lr-decay-style cosine \
         --min-lr 1.0e-5 \
-        --weight-decay 1e-2 \
+        --weight-decay 1e-2 
         --clip-grad 1.0 \
         --lr-warmup-fraction .01 \
         --log-interval 1 \
@@ -501,8 +501,8 @@ RUN_ARGS="\
 ./run_net.py ${NUM_GPUS} ${MODEL_NAME} ${RUN_ARGS}
 """
 
-Megatron v3.0.2
-mbs=16: /data/home/willfeng/checkpoints/willfeng/megatron_tp_pp/bert_120B/54267 -> working
+# Megatron v3.0.2
+# mbs=16: /data/home/willfeng/checkpoints/willfeng/megatron_tp_pp/bert_120B/54267 -> working
 
 
 """
