@@ -67,6 +67,147 @@ export USE_SYSTEM_NCCL=ON
 
 
 """
+BERT-L:
+
+NUM_GPUS=32
+MODEL_NAME=bert_l
+RUN_ARGS="\
+        --num-attention-heads 16 \
+        --hidden-size 1024 \
+        --num-layers 24 \
+        --tensor-model-parallel-size 8 \
+        --pipeline-model-parallel-size 4 \
+        `# --num-gpus ${NUM_GPUS}` \
+        --global-batch-size 4096 \
+        `# --data-parallel-size 1` \
+        `# --num-micro-batches 16` \
+        --micro-batch-size 256 \
+        --DDP-impl local \
+        --accumulate-allreduce-grads-in-fp32 \
+        `# --activations-checkpoint-method uniform` \
+        `# --distribute-checkpointed-activations` \
+        `# --empty-unused-memory-level 2` \
+    \
+        --train-iters 10 \
+        --lr-decay-iters 320000 \
+        --data-impl mmap \
+        --split 949,50,1 \
+        --lr 0.00015 \
+        --lr-decay-style cosine \
+        --min-lr 1.0e-5 \
+        --weight-decay 1e-2 \
+        --clip-grad 1.0 \
+        --lr-warmup-fraction .01 \
+        --log-interval 1 \
+        --save-interval 10000 \
+        --eval-interval 1000 \
+        --eval-iters 1 \
+        --distributed-backend nccl \
+        --bert-no-binary-head \
+    \
+        --seq-length 256 \
+        --padded-vocab-size 256 \
+        --max-position-embeddings 256 \
+        --fp16"
+./run_net.py ${NUM_GPUS} ${MODEL_NAME} ${RUN_ARGS}
+"""
+
+"""
+BERT-H:
+
+NUM_GPUS=32
+MODEL_NAME=bert_h
+RUN_ARGS="\
+        --num-attention-heads 16 \
+        --hidden-size 1280 \
+        --num-layers 32 \
+        --tensor-model-parallel-size 8 \
+        --pipeline-model-parallel-size 2 \
+        `# --num-gpus ${NUM_GPUS}` \
+        --global-batch-size 4096 \
+        `# --data-parallel-size 2` \
+        `# --num-micro-batches 16` \
+        --micro-batch-size 128 \
+        --DDP-impl local \
+        --accumulate-allreduce-grads-in-fp32 \
+        `# --activations-checkpoint-method uniform` \
+        `# --distribute-checkpointed-activations` \
+        `# --empty-unused-memory-level 2` \
+    \
+        --train-iters 10 \
+        --lr-decay-iters 320000 \
+        --data-impl mmap \
+        --split 949,50,1 \
+        --lr 0.00015 \
+        --lr-decay-style cosine \
+        --min-lr 1.0e-5 \
+        --weight-decay 1e-2 \
+        --clip-grad 1.0 \
+        --lr-warmup-fraction .01 \
+        --log-interval 1 \
+        --save-interval 10000 \
+        --eval-interval 1000 \
+        --eval-iters 1 \
+        --distributed-backend nccl \
+        --bert-no-binary-head \
+    \
+        --seq-length 256 \
+        --padded-vocab-size 256 \
+        --max-position-embeddings 256 \
+        --fp16"
+./run_net.py ${NUM_GPUS} ${MODEL_NAME} ${RUN_ARGS}
+"""
+
+
+"""
+BERT-10B:
+
+NUM_GPUS=32
+MODEL_NAME=bert_10B
+RUN_ARGS="\
+        --num-attention-heads 32 \
+        --hidden-size 5120 \
+        --num-layers 32 \
+        --tensor-model-parallel-size 8 \
+        --pipeline-model-parallel-size 2 \
+        `# --num-gpus ${NUM_GPUS}` \
+        --global-batch-size 4096 \
+        `# --data-parallel-size 2` \
+        `# --num-micro-batches 8` \
+        --micro-batch-size 256 \
+        --DDP-impl local \
+        --accumulate-allreduce-grads-in-fp32 \
+        --recompute-granularity full \
+        --recompute-method uniform \
+        --empty-unused-memory-level 2 \
+    \
+        --train-iters 10 \
+        --lr-decay-iters 320000 \
+        --data-impl mmap \
+        --split 949,50,1 \
+        --lr 0.00015 \
+        --lr-decay-style cosine \
+        --min-lr 1.0e-5 \
+        --weight-decay 1e-2 \
+        --clip-grad 1.0 \
+        --lr-warmup-fraction .01 \
+        --log-interval 1 \
+        --save-interval 10000 \
+        --eval-interval 1000 \
+        --eval-iters 1 \
+        --distributed-backend nccl \
+        --bert-no-binary-head \
+    \
+        --seq-length 256 \
+        --padded-vocab-size 256 \
+        --max-position-embeddings 256 \
+        --fp16"
+./run_net.py ${NUM_GPUS} ${MODEL_NAME} ${RUN_ARGS}
+"""
+
+
+
+"""
 BERT-10B:
 
 NUM_GPUS=...
@@ -125,15 +266,16 @@ RUN_ARGS="\
         --tensor-model-parallel-size 8 \
         --pipeline-model-parallel-size 4 \
         `# --num-gpus ${NUM_GPUS}` \
-        --global-batch-size 512 \
+        --global-batch-size 4096 \
         `# --data-parallel-size 1` \
-        `# --num-micro-batches 4` \
-        --micro-batch-size 128 \
+        `# --num-micro-batches 64` \
+        --micro-batch-size 64 \
         --DDP-impl local \
         --accumulate-allreduce-grads-in-fp32 \
-        `# --activations-checkpoint-method uniform` \
-        `# --distribute-checkpointed-activations` \
-        `# --empty-unused-memory-level 2` \
+        `# --recompute-granularity full` \
+        `# --recompute-method uniform` \
+        `# --distribute-saved-activations` \
+        --empty-unused-memory-level 2 \
     \
         --train-iters 10 \
         --lr-decay-iters 320000 \
@@ -180,6 +322,7 @@ RUN_ARGS="\
         --DDP-impl local \
         --recompute-granularity full \
         --recompute-method uniform \
+        --distribute-saved-activations \
         --empty-unused-memory-level 2 \
     \
         --train-iters 5 \
@@ -215,24 +358,25 @@ RUN_ARGS="\
 """
 BERT-60B:
 
-NUM_GPUS=...
+NUM_GPUS=32
 MODEL_NAME=bert_60B
 RUN_ARGS="\
         --num-attention-heads 32 \
         --hidden-size 10240 \
         --num-layers 48 \
         --tensor-model-parallel-size 8 \
-        --pipeline-model-parallel-size 2 \
+        --pipeline-model-parallel-size 4 \
         `# --num-gpus ${NUM_GPUS}` \
         --global-batch-size 2048 \
-        `# --data-parallel-size 8` \
-        `# --num-micro-batches 256` \
-        --micro-batch-size 1 \
+        `# --data-parallel-size 1` \
+        `# --num-micro-batches 32` \
+        --micro-batch-size 64 \
         --DDP-impl local \
         --accumulate-allreduce-grads-in-fp32 \
-        `# --activations-checkpoint-method uniform` \
-        `# --distribute-checkpointed-activations` \
-        `# --empty-unused-memory-level 2` \
+        --recompute-granularity full \
+        --recompute-method uniform \
+        --distribute-saved-activations \
+        --empty-unused-memory-level 2 \
     \
         --train-iters 10 \
         --lr-decay-iters 320000 \
@@ -313,26 +457,24 @@ RUN_ARGS="\
 """
 BERT-120B:
 
-NUM_GPUS=128
+NUM_GPUS=32
 MODEL_NAME=bert_120B
 RUN_ARGS="\
         --num-attention-heads 80 \
         --hidden-size 10240 \
         --num-layers 96 \
         --tensor-model-parallel-size 8 \
-        --pipeline-model-parallel-size 8 \
+        --pipeline-model-parallel-size 4 \
         `# --num-gpus ${NUM_GPUS}` \
         --global-batch-size 2048 \
-        `# --data-parallel-size 2` \
-        `# --num-micro-batches 64` \
-        --micro-batch-size 16 \
+        `# --data-parallel-size 1` \
+        `# --num-micro-batches 4` \
+        --micro-batch-size 32 \
         --DDP-impl local \
+        --accumulate-allreduce-grads-in-fp32 \
         --recompute-granularity full \
         --recompute-method uniform \
         --distribute-saved-activations \
-        --accumulate-allreduce-grads-in-fp32 \
-        `# --activations-checkpoint-method uniform` \
-        `# --distribute-checkpointed-activations` \
         --empty-unused-memory-level 2 \
     \
         --train-iters 10 \

@@ -98,6 +98,7 @@ def setup_executor(executor, name, num_gpus, **kwargs):
 
     num_gpus_per_node = min(NUM_GPUS, MAX_GPUS_PER_NODE)
     exclude_nodes = "a100-st-p4d24xlarge-45,a100-st-p4d24xlarge-6,a100-st-p4d24xlarge-45,a100-st-p4d24xlarge-46,a100-st-p4d24xlarge-47,a100-st-p4d24xlarge-48"
+    include_nodes = "a100-st-p4d24xlarge-45,a100-st-p4d24xlarge-46,a100-st-p4d24xlarge-47,a100-st-p4d24xlarge-48"
     slurm_additional_parameters = {"mail-user": "", "mail-type": "END"}
     args = {
         "gpus_per_node": num_gpus_per_node,
@@ -116,4 +117,5 @@ def setup_executor(executor, name, num_gpus, **kwargs):
     #     args["mem_gb"] = launch.MEM_PER_GPU * num_gpus_per_node  # this line corresponds to `--mem` in submitit script
     # else:
     #     args["slurm_additional_parameters"]["exclude"] = exclude_nodes
+    args["slurm_additional_parameters"]["include"] = include_nodes
     executor.update_parameters(**args, **kwargs)
