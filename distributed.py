@@ -98,7 +98,7 @@ def setup_executor(executor, name, num_gpus, **kwargs):
 
     num_gpus_per_node = min(NUM_GPUS, MAX_GPUS_PER_NODE)
     # exclude_nodes = "a100-st-p4d24xlarge-45,a100-st-p4d24xlarge-6,a100-st-p4d24xlarge-45,a100-st-p4d24xlarge-46,a100-st-p4d24xlarge-47,a100-st-p4d24xlarge-48"
-    exclude_nodes = "a100-st-p4d24xlarge-14,a100-st-p4d24xlarge-15,a100-st-p4d24xlarge-16,a100-st-p4d24xlarge-38,a100-st-p4d24xlarge-39,a100-st-p4d24xlarge-40,a100-st-p4d24xlarge-41"
+    exclude_nodes = "a100-st-p4d24xlarge-14,a100-st-p4d24xlarge-15,a100-st-p4d24xlarge-16,a100-st-p4d24xlarge-23,a100-st-p4d24xlarge-24,a100-st-p4d24xlarge-25,a100-st-p4d24xlarge-26,a100-st-p4d24xlarge-38,a100-st-p4d24xlarge-39,a100-st-p4d24xlarge-40,a100-st-p4d24xlarge-41"
     slurm_additional_parameters = {"mail-user": "", "mail-type": "END"}
     args = {
         "gpus_per_node": num_gpus_per_node,

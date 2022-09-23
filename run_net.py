@@ -266,16 +266,16 @@ RUN_ARGS="\
         --tensor-model-parallel-size 8 \
         --pipeline-model-parallel-size 4 \
         `# --num-gpus ${NUM_GPUS}` \
-        --global-batch-size 4096 \
+        --global-batch-size 2048 \
         `# --data-parallel-size 1` \
-        `# --num-micro-batches 32` \
-        --micro-batch-size 128 \
+        `# --num-micro-batches 128` \
+        --micro-batch-size 16 \
         --DDP-impl local \
         --accumulate-allreduce-grads-in-fp32 \
         `# --recompute-granularity full` \
         `# --recompute-method uniform` \
         `# --distribute-saved-activations` \
-        --empty-unused-memory-level 2 \
+        `# --empty-unused-memory-level 2` \
     \
         --train-iters 10 \
         --lr-decay-iters 320000 \
