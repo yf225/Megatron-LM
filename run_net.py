@@ -80,8 +80,8 @@ RUN_ARGS="\
         `# --num-gpus ${NUM_GPUS}` \
         --global-batch-size 4096 \
         `# --data-parallel-size 1` \
-        `# --num-micro-batches 16` \
-        --micro-batch-size 256 \
+        `# --num-micro-batches 32` \
+        --micro-batch-size 128 \
         --DDP-impl local \
         --accumulate-allreduce-grads-in-fp32 \
         `# --activations-checkpoint-method uniform` \
@@ -268,8 +268,8 @@ RUN_ARGS="\
         `# --num-gpus ${NUM_GPUS}` \
         --global-batch-size 2048 \
         `# --data-parallel-size 1` \
-        `# --num-micro-batches 128` \
-        --micro-batch-size 16 \
+        `# --num-micro-batches 256` \
+        --micro-batch-size 8 \
         --DDP-impl local \
         --accumulate-allreduce-grads-in-fp32 \
         `# --recompute-granularity full` \
@@ -300,6 +300,9 @@ RUN_ARGS="\
         --fp16"
 ./run_net.py ${NUM_GPUS} ${MODEL_NAME} ${RUN_ARGS}
 """
+
+# - /data/home/willfeng/checkpoints/willfeng/megatron_tp_pp/bert_25B/67676 -> DONE
+# - /data/home/willfeng/checkpoints/willfeng/megatron_tp_pp/bert_25B/67682 -> RUNNING
 
 """
 BERT-25B dummy optimizer (for Alpa comparison):
@@ -369,8 +372,8 @@ RUN_ARGS="\
         `# --num-gpus ${NUM_GPUS}` \
         --global-batch-size 2048 \
         `# --data-parallel-size 1` \
-        `# --num-micro-batches 32` \
-        --micro-batch-size 64 \
+        `# --num-micro-batches 16` \
+        --micro-batch-size 128 \
         --DDP-impl local \
         --accumulate-allreduce-grads-in-fp32 \
         --recompute-granularity full \
@@ -401,6 +404,8 @@ RUN_ARGS="\
         --fp16"
 ./run_net.py ${NUM_GPUS} ${MODEL_NAME} ${RUN_ARGS}
 """
+
+# - /data/home/willfeng/checkpoints/willfeng/megatron_tp_pp/bert_60B/67686 -> RUNNING
 
 """
 BERT-60B dummy optimizer (for Alpa comparison):
