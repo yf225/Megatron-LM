@@ -127,7 +127,8 @@ def forward_step(forward_step_func,
         unwrap_output_tensor = True
 
     unwrapped_model.set_input_tensor(input_tensor)
-    output_tensor, loss_func = forward_step_func(data_iterator, model)
+    with torch.autograd.profiler.record_function("### forward ###"):
+        output_tensor, loss_func = forward_step_func(data_iterator, model)
     if mpu.is_pipeline_last_stage():
         if not collect_non_loss_data:
             output_tensor = loss_func(output_tensor)
@@ -185,7 +186,12 @@ def backward_step(optimizer, input_tensor, output_tensor, output_tensor_grad):
     # Backward pass.
     if output_tensor_grad[0] is None:
         output_tensor = optimizer.scale_loss(output_tensor[0])
-    custom_backward(output_tensor[0], output_tensor_grad[0])
+    with torch.autograd.profiler.record_function("### backward ###"):
+        # if output_tensor_grad[0] is not None:
+        #     # FIXME: crazy hack to make things work...
+        #     if list(output_tensor_grad[0].shape) == [args.seq_length, args.micro_batch_size, args.hidden_size]:
+        #         output_tensor_grad[0] = output_tensor_grad[0][:, 0, :]
+        custom_backward(output_tensor[0], output_tensor_grad[0])
 
     # Collect the grad of the input_tensor.
     input_tensor_grad = [None]

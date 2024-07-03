@@ -19,6 +19,9 @@ from datetime import datetime
 import math
 import sys
 import time
+import statistics
+import os
+# import numa
 # The earliest we can measure the start time.
 _TRAIN_START_TIME = time.time()
 import torch
@@ -53,6 +56,8 @@ from megatron.utils import calc_params_l2_norm
 from megatron.schedules import get_forward_backward_func
 from megatron.utils import report_memory
 from megatron.model.vision.knn_monitor import compute_feature_bank
+
+should_profile = True
 
 
 def print_datetime(string):
@@ -104,6 +109,12 @@ def pretrain(train_valid_test_dataset_provider,
     # Set pytorch JIT layer fusion options and warmup JIT functions.
     set_jit_fusion_options()
 
+    # # Add NUMA binding
+    # num_sockets = 2  # `grep "physical id"  /proc/cpuinfo | sort -u | wc -l`
+    # socket_id = torch.distributed.get_rank() // (8 // num_sockets)
+    # node_mask = set([socket_id])
+    # numa.bind(node_mask)
+
     # Adjust the startup time so it reflects the largest value.
     # This will be closer to what scheduler will see (outside of
     # image ... launches.
@@ -151,10 +162,39 @@ def pretrain(train_valid_test_dataset_provider,
 
     iteration = 0
     if args.do_train and args.train_iters > 0:
+        from torch.nn.modules.module import register_module_forward_pre_hook
+        from torch.nn.modules.module import register_module_forward_hook
+
+        def recorder_enter_hook(module, input):
+            module._torch_profiler_recorder = torch.autograd.profiler.record_function(str(module.__class__))
+            module._torch_profiler_recorder.__enter__()
+
+        def recorder_exit_hook(module, input, output):
+            module._torch_profiler_recorder.__exit__(None, None, None)
+
+        register_module_forward_pre_hook(recorder_enter_hook)
+        register_module_forward_hook(recorder_exit_hook)
+
+        if should_profile:
+            prof = torch.profiler.profile(
+                activities=[
+                    torch.profiler.ProfilerActivity.CPU,
+                    torch.profiler.ProfilerActivity.CUDA,
+                ]
+            )
+            prof.__enter__()
+
         iteration = train(forward_step_func,
                           model, optimizer, opt_param_scheduler,
                           train_data_iterator, valid_data_iterator,
                           process_non_loss_data_func)
+
+        if should_profile:
+            prof.__exit__(None, None, None)
+            trace_dir_path = "megatron_trace"
+            if not os.path.isdir(trace_dir_path):
+                os.mkdir(trace_dir_path)
+            prof.export_chrome_trace(os.path.join(trace_dir_path, "trace_{}_{}.json".format(str(int(time.time())), str(torch.distributed.get_rank()))))
     print_datetime('after training is done')
 
     if args.do_valid:
@@ -472,7 +512,7 @@ def train_step(forward_step_func, data_iterator,
                 grad = word_embeddings_weight.grad
             torch.distributed.all_reduce(grad, group=mpu.get_embedding_group())
 
-    # All-reduce position_embeddings grad across first (encoder) and split (decoder) 
+    # All-reduce position_embeddings grad across first (encoder) and split (decoder)
     # stages to ensure that position embeddings parameters stay in sync.
     # This should only run for T5 models with pipeline parallelism
     if mpu.is_rank_in_position_embedding_group() and \
@@ -495,7 +535,9 @@ def train_step(forward_step_func, data_iterator,
 
     # Update parameters.
     timers('optimizer').start()
-    update_successful, grad_norm, num_zeros_in_grad = optimizer.step()
+    with torch.autograd.profiler.record_function("### optimizer step ###"):
+        update_successful, grad_norm, num_zeros_in_grad = optimizer.step()
+        update_successful = True  # HACK: force true
     timers('optimizer').stop()
 
     if args.vision_pretraining and args.vision_pretraining_type == "dino":
@@ -689,7 +731,7 @@ def training_log(loss_dict, total_loss_dict, learning_rate, iteration,
         total_loss_dict[advanced_iters_key] = 0
         total_loss_dict[skipped_iters_key] = 0
         total_loss_dict[nan_iters_key] = 0
-        print_rank_last(log_string)
+        print_rank_0(log_string)
         if report_memory_flag and learning_rate > 0.:
             # Report memory after optimizer state has been initialized.
             report_memory('(after {} iterations)'.format(iteration))
@@ -734,6 +776,8 @@ def train(forward_step_func, model, optimizer, opt_param_scheduler,
     timers('interval-time').start()
     print_datetime('before the start of training step')
     report_memory_flag = True
+    step_duration_list = []
+    step_start_time = time.time()
     while iteration < args.train_iters:
         update_num_microbatches(args.consumed_train_samples)
         args.curr_iteration = iteration
@@ -814,6 +858,10 @@ def train(forward_step_func, model, optimizer, opt_param_scheduler,
             print_datetime('exiting program at iteration {}'.format(iteration))
             sys.exit()
 
+        step_duration_list.append(time.time() - step_start_time)
+        step_start_time = time.time()
+
+    print_rank_0("micro_batch_size: {}, median step duration (s): {:.3f}".format(args.micro_batch_size, statistics.median(step_duration_list)))
 
     return iteration
 

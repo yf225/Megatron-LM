@@ -82,8 +82,10 @@ def split_tensor_into_1d_equal_chunks(tensor, new_buffer=False):
         data.copy_(tensor.view(-1)[start_index:end_index])
     else:
         data = tensor.view(-1)[start_index:end_index]
+        # TODO: I ... don't understand why we need this fix yet.
+        # data = tensor.reshape(-1)[start_index:end_index]
     return data
-    
+
 
 def gather_split_1d_tensor(tensor):
     """Opposite of above function, gather values from model parallel ranks."""

@@ -109,7 +109,7 @@ class MegatronModule(torch.nn.Module):
                 torch.distributed.all_reduce(self.word_embeddings_weight().data,
                                              group=mpu.get_embedding_group())
 
-            # Ensure that encoder(first stage) and decoder(split stage) position 
+            # Ensure that encoder(first stage) and decoder(split stage) position
             # embeddings have the same initial parameter values
             # NOTE: We don't currently support T5 with the interleaved schedule.
             if mpu.is_rank_in_position_embedding_group() and \

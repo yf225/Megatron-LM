@@ -39,9 +39,9 @@ class VitClassificationModel(MegatronModule):
         self.backbone = VitBackbone(
             pre_process=self.pre_process,
             post_process=self.post_process,
-            single_token_output=True
+            single_token_output=False
         )
-        
+
         if self.post_process:
             if not self.finetune:
                 self.head = VitMlpHead(self.hidden_size, self.num_classes)
